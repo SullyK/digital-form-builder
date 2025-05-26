@@ -37,7 +37,11 @@ export async function validateContentTypes(
       (component) => component.name === fieldName
     );
 
-    const customAcceptedTypes = component.customAcceptedTypes;
+    const id = request.params?.id;
+    const forms = request.server?.app?.forms;
+    const model = id && forms?.[id];
+    const configAllowedType = model?.def?.uploadServiceOptions.allowedFileTypes;
+    const customAcceptedTypes = configAllowedType ?? component.customAcceptedTypes;
 
     const originalFilenameLocation = originalFilenames[fieldName]?.location;
 

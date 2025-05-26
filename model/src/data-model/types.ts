@@ -165,6 +165,12 @@ export type Fee = {
   prefix?: string;
 };
 
+export type UploadServiceOptions = {
+  allowedFileTypes: string[];
+  fileSizeLimit?: number;
+  documentUploadApiUrl: string; 
+};
+
 export type AdditionalReportingColumn = {
   columnName: string;
   fieldPath?: string;
@@ -214,4 +220,5 @@ export type FormDefinition = {
   jwtKey?: string | undefined;
   toggle?: boolean | string | undefined;
   retryTimeoutSeconds?: number | undefined;
+  uploadServiceOptions?: UploadServiceOptions;
 };

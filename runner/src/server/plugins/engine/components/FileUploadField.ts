@@ -14,44 +14,47 @@ type FileUploadAttributes = {
 export class FileUploadField extends FormComponent {
   dataType = "file" as DataType;
   attributes: FileUploadAttributes = {
-    accept: "image/jpeg,image/gif,image/png,application/pdf",
+    accept: "",
   };
   customAcceptedTypes?: string[];
 
-  constructor(def: FileUploadFieldComponent, model: FormModel) {
-    super(def, model);
+constructor(def: FileUploadFieldComponent, model: FormModel) {
+  super(def, model);
 
-    const { options = {} } = def;
+  const { options = {} } = def;
+  const formLevelAcceptedTypes = model.def?.uploadServiceOptions?.allowedFileTypes;
 
-    let componentSchema = joi.string().label(def.title.toLowerCase());
+  let componentSchema = joi.string().label(def.title.toLowerCase());
 
-    if (options.required === false) {
-      componentSchema = componentSchema.allow("").allow(null);
-    }
+  if (options.required === false) {
+    componentSchema = componentSchema.allow("").allow(null);
+  }
 
-    if (options.multiple) {
-      this.attributes.multiple = "multiple";
-    }
+  if (options.multiple) {
+    this.attributes.multiple = "multiple";
+  }
 
-    if (options.accept) {
-      this.attributes.accept = options.accept;
-      this.customAcceptedTypes = options.accept
-        .split(",")
-        .map((type) => type.trim());
-    }
+  const acceptedTypes = formLevelAcceptedTypes?.length
+  ? formLevelAcceptedTypes
+  : options.accept?.split(",").map((type) => type.trim());
 
-    componentSchema = componentSchema.messages({
-      "string.empty": "Upload {{#label}}",
-    });
+  if (acceptedTypes?.length) {
+    this.attributes.accept = acceptedTypes.join(","); 
+    this.customAcceptedTypes = acceptedTypes;
+  }
 
-    if (options.customValidationMessages) {
+  componentSchema = componentSchema.messages({
+    "string.empty": "Upload {{#label}}",
+  });
+
+  if (options.customValidationMessages) {
       componentSchema = componentSchema.messages(
         options.customValidationMessages
       );
-    }
+}
 
-    this.schema = componentSchema;
-  }
+  this.schema = componentSchema;
+}
   getFormSchemaKeys() {
     return { [this.name]: this.schema as Schema };
   }

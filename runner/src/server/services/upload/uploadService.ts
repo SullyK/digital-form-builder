@@ -40,7 +40,7 @@ export class UploadService {
   logger: HapiServer["logger"];
   constructor(server) {
     this.logger = server.logger;
-  }
+    }
 
   validContentTypes = ["image/jpeg", "image/png", "application/pdf"];
 
@@ -104,7 +104,7 @@ export class UploadService {
     });
   }
 
-  async uploadDocuments(streams: any[]) {
+  async uploadDocuments(streams: any[], formApiUrl?: string) {
     const form = new FormData();
     for (const stream of streams) {
       form.append("files", stream, {
@@ -114,13 +114,16 @@ export class UploadService {
     }
 
     const requestData = { headers: form.getHeaders(), payload: form };
+    debugger;
+    const uploadUrl = formApiUrl ?? config.documentUploadApiUrl;
     const responseData = await post(
-      `${config.documentUploadApiUrl}/v1/files`,
+      `${uploadUrl}/v1/files`,
       requestData
     );
 
     return this.parsedDocumentUploadResponse(responseData);
   }
+
 
   parsedDocumentUploadResponse({ res, payload }) {
     const warning = payload?.toString?.();
